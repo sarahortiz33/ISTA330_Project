@@ -1,11 +1,12 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  host: 'ista-330-ista330-proj1.f.aivencloud.com',
-  port: 24264,
-  user: 'avnadmin',
-  password: 'AVNS_oLS0r6uLhRxzwWYKy45',
-  database: 'defaultdb', // Or replace if your DB name is different
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
+  user: process.env.PG_USER,
+  password: process.env.PG_PASSWORD,
+  database: process.env.PG_DATABASE,
   ssl: {
     rejectUnauthorized: false
   }
