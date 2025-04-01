@@ -6,7 +6,7 @@ const app = express(); //Creates an Express application
 app.use(express.json()); // Middleware to parse JSON data. It allows you to work with req.body when handling POST or PUT requests.
 app.use(cors()); // This middleware enables CORS
 
-const { database_store } = require('./db');
+const { database_store } = require('./models/db');
 
 
 app.get('/', (req, res) => {
@@ -43,6 +43,6 @@ app.post('/login', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
