@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Register from "./pages/RegisterPage";
 import Login from "./pages/LoginPage";
 import Home from "./pages/HomePage";
@@ -20,14 +20,24 @@ function App() {
 
   return (
     <Router>
-      <AppNavbar />
+      {user && <AppNavbar />} {/* Show navbar only when logged in */}
 
       <Container className="mt-4">
         <Routes>
-          <Route path="/register" element={<Register setUser={setUser} />} />
-          <Route path="/login" element={<Login setUser={setUser} />} />
-          <Route path="/home" element={user ? <Home /> : <Login setUser={setUser} />} />
-          <Route path="/about" element={<About />} />
+          {!user ? (
+            <>
+              <Route path="/" element={<Register setUser={setUser} />} />
+              <Route path="/register" element={<Register setUser={setUser} />} />
+              <Route path="/login" element={<Login setUser={setUser} />} />
+              <Route path="*" element={<Navigate to="/register" />} />
+            </>
+          ) : (
+            <>
+              <Route path="/home" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="*" element={<Navigate to="/home" />} />
+            </>
+          )}
         </Routes>
       </Container>
     </Router>

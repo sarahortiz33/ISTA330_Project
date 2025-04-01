@@ -1,15 +1,13 @@
-const express = require('express');
-const cors = require('cors');
-
+const express = require("express");
+const cors = require("cors");
 const app = express();
+const authRoutes = require("./routes/auth"); // make sure path is correct
+
 app.use(cors());
 app.use(express.json());
 
-// Routes
-const aboutRoute = require('./routes/about');
-app.use('/about', aboutRoute);
+app.use("/", authRoutes); // hook the routes here
 
-// Start server
 const PORT = 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

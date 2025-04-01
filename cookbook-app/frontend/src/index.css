@@ -1,0 +1,16 @@
+/* Reset spacing and apply layout */
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa; /* soft background */
+}
+
+/* Prevent horizontal scroll */
+* {
+  box-sizing: border-box;
+}
+
+/* Optional: style the page background */
+.register-page {
+  background-color: #f8f9fa;
+}
