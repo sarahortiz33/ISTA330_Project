@@ -1,36 +1,38 @@
-const mongoose = require('mongoose');
+const pool = require('./db');
 const bcrypt = require('bcryptjs'); //A library for hashing passwords and securely comparing passwords
 
-// This defines the structure (or schema) for the User document in MongoDB.
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
+
+const addUser = async (firstName, lastName, email, password, dob) => {
+  const query = `
+    INSERT INTO users (first_name, last_name, email, password, dob)
+    VALUES ($1, $2, $3, $4, $5);
+  `;
+  
+  const values = [firstName, lastName, email, password, dob];
+  
+  try {
+    await pool.query(query, values);
+    console.log('User added successfully');
+  } catch (err) {
+    console.error('Error inserting user:', err);
   }
-});
-
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
-
-// Method to compare passwords during login
-userSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// This creates a Mongoose model named User using the userSchema we defined earlier. The model allows you to interact with the users collection in the MongoDB database, such as creating, reading, updating, and deleting user documents.
-const User = mongoose.model('User', userSchema);
-// This exports the User model so that it can be used in other parts of the application.
-module.exports = User;
+const findUserByEmail = async (email) => {
+  const query = 'SELECT * FROM users WHERE email = $1';
+  const res = await pool.query(query, [email]);
+  return res.rows[0];
+};
+
+const matchPassword = async (enteredPassword, hashedPassword) => {
+  return await bcrypt.compare(enteredPassword, hashedPassword);
+};
+
+module.exports = {
+  addUser,
+  findUserByEmail,
+  matchPassword
+};
+
+
+
