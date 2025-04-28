@@ -1,46 +1,59 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Register from "./pages/RegisterPage";
-import Login from "./pages/LoginPage";
-import Home from "./pages/HomePage";
-import About from "./pages/AboutPage";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import AppNavbar from "./components/Navbar";
-import { Container } from "react-bootstrap";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setUser({ token });
+    const email = localStorage.getItem("email");
+    const userId = localStorage.getItem("userId");
+
+    if (token && email) {
+      // Fetch user info again
+      fetch(`http://localhost:5001/profile/${email}`)
+        .then((res) => res.json())
+        .then((profileData) => {
+          setUser({
+            token: token,
+            email: email,
+            firstName: profileData.first_name,
+            lastName: profileData.last_name,
+            dob: profileData.dob,
+            userId: parseInt(userId) // ✅ optional
+          });
+        })
+        .catch((err) => {
+          console.error("Error loading profile:", err);
+          setUser(null);
+        });
     }
   }, []);
 
   return (
-    <Router>
-      {user && <AppNavbar />} {/* Show navbar only when logged in */}
-
-      <Container className="mt-4">
-        <Routes>
-          {!user ? (
-            <>
-              <Route path="/" element={<Register setUser={setUser} />} />
-              <Route path="/register" element={<Register setUser={setUser} />} />
-              <Route path="/login" element={<Login setUser={setUser} />} />
-              <Route path="*" element={<Navigate to="/register" />} />
-            </>
-          ) : (
-            <>
-              <Route path="/home" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="*" element={<Navigate to="/home" />} />
-            </>
-          )}
-        </Routes>
-      </Container>
-    </Router>
+    <BrowserRouter>
+      {user && <AppNavbar setUser={setUser} />}
+      <Routes>
+        {!user ? (
+          <>
+            <Route path="/" element={<LoginPage setUser={setUser} />} />
+            <Route path="/login" element={<LoginPage setUser={setUser} />} /> {/* ✅ Login route */}
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/about" element={<AboutPage />} />
+          </>
+        ) : (
+          <>
+            <Route path="/home" element={<HomePage user={user} />} />
+            <Route path="/about" element={<AboutPage />} />
+          </>
+        )}
+      </Routes>
+    </BrowserRouter>
   );
 }
 
