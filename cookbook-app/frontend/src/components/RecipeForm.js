@@ -11,8 +11,10 @@ export default function RecipeForm({ onAddRecipe }) {
     style: "",
     prepTime: "",
     servings: "",
-    photoUrl: ""
   });
+
+  const [photoFile, setPhotoFile] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,9 +24,57 @@ export default function RecipeForm({ onAddRecipe }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleFileChange = (e) => {
+    setPhotoFile(e.target.files[0]);
+  };
+
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (!recipeData.dishName) newErrors.dishName = true;
+    if (!recipeData.ingredients) newErrors.ingredients = true;
+    if (!recipeData.instructions) newErrors.instructions = true;
+    if (!recipeData.category) newErrors.category = true;
+
+    if (!recipeData.servings || parseInt(recipeData.servings) <= 0) newErrors.servings = true;
+    if (!recipeData.prepTime || parseInt(recipeData.prepTime) <= 0) newErrors.prepTime = true;
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAddRecipe(recipeData);
+
+    const fieldErrors = validateFields();
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return;
+    }
+
+    let photoUrl = "";
+
+    if (photoFile) {
+      const formData = new FormData();
+      formData.append("photo", photoFile);
+
+      try {
+        const response = await fetch("http://localhost:5001/home/upload-photo", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        photoUrl = data.filename;
+      } catch (error) {
+        console.error("Error uploading photo:", error);
+      }
+    }
+
+    const finalRecipeData = { ...recipeData, photoUrl };
+
+    onAddRecipe(finalRecipeData);
+
+    // Reset form after successful submit
     setRecipeData({
       dishName: "",
       shortDescription: "",
@@ -34,13 +84,13 @@ export default function RecipeForm({ onAddRecipe }) {
       style: "",
       prepTime: "",
       servings: "",
-      photoUrl: ""
     });
+    setPhotoFile(null);
+    setErrors({});
   };
 
   return (
     <Form onSubmit={handleSubmit} className="mb-4">
-      <h4>Add New Recipe</h4>
 
       <Form.Group className="mb-2">
         <Form.Label>Dish Name</Form.Label>
@@ -49,7 +99,7 @@ export default function RecipeForm({ onAddRecipe }) {
           name="dishName"
           value={recipeData.dishName}
           onChange={handleChange}
-          required
+          isInvalid={errors.dishName}
         />
       </Form.Group>
 
@@ -69,6 +119,7 @@ export default function RecipeForm({ onAddRecipe }) {
           name="category"
           value={recipeData.category}
           onChange={handleChange}
+          isInvalid={errors.category}
         >
           <option value="breakfast">Breakfast</option>
           <option value="lunch">Lunch</option>
@@ -85,6 +136,7 @@ export default function RecipeForm({ onAddRecipe }) {
           name="ingredients"
           value={recipeData.ingredients}
           onChange={handleChange}
+          isInvalid={errors.ingredients}
         />
       </Form.Group>
 
@@ -96,6 +148,7 @@ export default function RecipeForm({ onAddRecipe }) {
           name="instructions"
           value={recipeData.instructions}
           onChange={handleChange}
+          isInvalid={errors.instructions}
         />
       </Form.Group>
 
@@ -116,6 +169,7 @@ export default function RecipeForm({ onAddRecipe }) {
           name="prepTime"
           value={recipeData.prepTime}
           onChange={handleChange}
+          isInvalid={errors.prepTime}
         />
       </Form.Group>
 
@@ -126,22 +180,41 @@ export default function RecipeForm({ onAddRecipe }) {
           name="servings"
           value={recipeData.servings}
           onChange={handleChange}
+          isInvalid={errors.servings}
         />
       </Form.Group>
 
+      {/* Upload Photo */}
       <Form.Group className="mb-3">
-        <Form.Label>Photo URL (optional)</Form.Label>
+        <Form.Label>Upload Photo</Form.Label>
         <Form.Control
-          type="text"
-          name="photoUrl"
-          value={recipeData.photoUrl}
-          onChange={handleChange}
+          type="file"
+          onChange={handleFileChange}
+          accept="image/*"
         />
       </Form.Group>
 
-      <Button variant="primary" type="submit">
-        Add Recipe
+      <Button
+        type="submit"
+        style={{
+          backgroundColor: "#f8c291",
+          border: "none",
+          color: "#4e342e",
+          fontWeight: "bold",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          marginTop: "15px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          width: "100%",
+          fontSize: "1.1rem",
+          transition: "background-color 0.3s",
+        }}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = "#f6b08b")}
+        onMouseLeave={(e) => (e.target.style.backgroundColor = "#f8c291")}
+      >
+        🍳 Add Recipe
       </Button>
+
     </Form>
   );
 }

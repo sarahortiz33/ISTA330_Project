@@ -1,7 +1,22 @@
+// routes/auth.js
+
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const db = require("../models/db");
+const multer = require("multer"); 
+const path = require("path");
+
+// Set up multer for profile picture uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
 
 // POST /register
 router.post("/register", async (req, res) => {
@@ -47,7 +62,7 @@ router.post("/login", async (req, res) => {
     res.status(200).json({ 
       done: true, 
       message: "Login successful", 
-      userId: user.id // ✅ Add userId here
+      userId: user.id // returning userId
     });
   } catch (err) {
     console.error("Error in /login:", err);
@@ -57,11 +72,11 @@ router.post("/login", async (req, res) => {
 
 // GET /profile/:email
 router.get("/profile/:email", async (req, res) => {
-  const email = req.params.email;
+  const { email } = req.params;
 
   try {
     const result = await db.query(
-      "SELECT first_name, last_name, dob FROM users WHERE email = $1",
+      "SELECT first_name, last_name, dob, status, profile_pic FROM users WHERE email = $1",
       [email]
     );
 
@@ -73,6 +88,35 @@ router.get("/profile/:email", async (req, res) => {
   } catch (err) {
     console.error("Error fetching profile:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// POST /update-status
+router.post("/update-status", async (req, res) => {
+  const { userId, status } = req.body;
+  try {
+    await db.query(
+      "UPDATE users SET status = $1 WHERE id = $2",
+      [status, userId]
+    );
+    res.json({ message: "Status updated successfully" });
+  } catch (err) {
+    console.error("Error updating status:", err);
+    res.status(500).json({ error: "Failed to update status" });
+  }
+});
+
+// POST /upload-profile-pic
+router.post("/upload-profile-pic", upload.single("profile_pic"), async (req, res) => {
+  const { userId } = req.body;
+  const profilePicFilename = req.file.filename;
+
+  try {
+    await db.query("UPDATE users SET profile_pic = $1 WHERE id = $2", [profilePicFilename, userId]);
+    res.json({ message: "Profile picture uploaded successfully!", filename: profilePicFilename });
+  } catch (err) {
+    console.error("Error uploading profile picture:", err);
+    res.status(500).json({ error: "Failed to upload profile picture" });
   }
 });
 

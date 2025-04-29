@@ -1,7 +1,31 @@
 const express = require("express");
+const multer = require('multer');  
 const router = express.Router();
 const recipeModel = require("../models/recipeModel");
-const db = require("../models/db"); // ✅ Needed for direct DB queries
+const db = require("../models/db"); 
+const upload = multer({ dest: 'uploads/' });
+
+
+//  Search Route
+router.get("/search", async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    const result = await db.query(
+      `SELECT * FROM recipes
+       WHERE LOWER(dish_name) LIKE LOWER($1)
+          OR LOWER(category) LIKE LOWER($1)
+          OR LOWER(style) LIKE LOWER($1)`,
+      [`%${query}%`]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error searching recipes:", err);
+    res.status(500).json({ error: "Failed to search recipes" });
+  }
+});
+
 
 // POST /home - Add a new recipe
 router.post("/", async (req, res) => {
@@ -38,6 +62,15 @@ router.delete("/:recipeId", async (req, res) => {
     console.error("Error deleting recipe:", error);
     res.status(500).json({ message: "Error deleting recipe" });
   }
+});
+
+// Upload photo
+router.post('/upload-photo', upload.single('photo'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  res.json({ filename: req.file.filename });
 });
 
 module.exports = router;

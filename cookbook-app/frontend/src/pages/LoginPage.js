@@ -34,7 +34,7 @@ export default function LoginPage({ setUser }) {
       });
 
       const data = await response.json();
-      console.log('Login response:', data); // 🔍 Debugging line
+      console.log('Login response:', data); 
 
       if (data.done) {
         localStorage.setItem("token", "dummy-token");
@@ -55,7 +55,7 @@ export default function LoginPage({ setUser }) {
           firstName: profileData.first_name,
           lastName: profileData.last_name,
           dob: profileData.dob,
-          userId: data.userId // ✅ Correct here
+          userId: data.userId 
         });
 
         navigate("/home"); 

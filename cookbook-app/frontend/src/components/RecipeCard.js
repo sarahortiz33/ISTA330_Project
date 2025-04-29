@@ -26,6 +26,23 @@ export default function RecipeCard({ recipe, onDelete }) {
         </Button>
       )}
 
+      {/* Image at the top */}
+      {recipe.photo_url && (
+        <Card.Img 
+          variant="top" 
+          src={`http://localhost:5001/uploads/${recipe.photo_url}`} //  Prepend /uploads/
+          alt="Dish"
+          style={{
+            height: "200px",
+            objectFit: "cover",
+            borderTopLeftRadius: "8px",
+            borderTopRightRadius: "8px",
+            cursor: "pointer"
+          }}
+          onClick={() => setOpen(!open)}
+        />
+      )}
+
       <Card.Body onClick={() => setOpen(!open)} style={{ cursor: "pointer" }}>
         {/* Always visible */}
         <Card.Title>{recipe.dish_name}</Card.Title>
@@ -38,22 +55,10 @@ export default function RecipeCard({ recipe, onDelete }) {
           <div>
             <hr />
             {recipe.short_description && (
-              <>
-                <Card.Text><strong>Description:</strong> {recipe.short_description}</Card.Text>
-              </>
+              <Card.Text><strong>Description:</strong> {recipe.short_description}</Card.Text>
             )}
             <Card.Text><strong>Ingredients:</strong> {recipe.ingredients}</Card.Text>
             <Card.Text><strong>Instructions:</strong> {recipe.instructions}</Card.Text>
-
-            {recipe.photo_url && (
-              <div className="text-center">
-                <img
-                  src={recipe.photo_url}
-                  alt="Dish"
-                  style={{ maxWidth: "100%", height: "auto", marginTop: "10px", borderRadius: "8px" }}
-                />
-              </div>
-            )}
           </div>
         </Collapse>
       </Card.Body>

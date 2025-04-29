@@ -14,3 +14,22 @@ body, html {
 .register-page {
   background-color: #f8f9fa;
 }
+
+
+/* Custom Modal Styling */
+.recipe-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-modal .modal-content {
+  background-color: #fff8f0;
+  border-radius: 12px;
+  padding: 30px;
+  width: 400px; 
+  max-height: 600px; 
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  margin: auto;
+}

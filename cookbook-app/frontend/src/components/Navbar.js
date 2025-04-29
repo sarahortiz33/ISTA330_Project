@@ -1,29 +1,35 @@
-import React from 'react';
-import { Nav, Navbar, Container } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom'; // ✅ Import useNavigate
+import React from "react";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-export default function AppNavbar({ setUser }) { // ✅ Accept setUser prop
+export default function AppNavbar({ setUser }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // ✅ Clear stored token
-    setUser(null); // ✅ Reset user in memory
-    navigate("/login"); // ✅ Redirect to login page
+    localStorage.clear();
+    setUser(null);
+    navigate("/");
   };
 
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
       <Container>
-        <Navbar.Brand>Cookbook App</Navbar.Brand>
-        <Nav className="me-auto">
-          <Nav.Link as={Link} to="/home">Home</Nav.Link>
-          <Nav.Link as={Link} to="/about">About</Nav.Link>
-        </Nav>
-        <Nav>
-          <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>
+        <Navbar.Brand onClick={() => navigate("/home")} style={{ cursor: "pointer" }}>
+          🍴 Cookbook
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link onClick={() => navigate("/favorites")}>Favorites</Nav.Link>
+            <Nav.Link onClick={() => navigate("/following-recipes")}>Following Recipes</Nav.Link> 
+            <Nav.Link onClick={() => navigate("/followers")}>Followers</Nav.Link>
+            <Nav.Link onClick={() => navigate("/search")}>Search</Nav.Link>
+            <Nav.Link onClick={() => navigate("/about")}>About</Nav.Link>
+          </Nav>
+          <Button variant="outline-light" size="sm" onClick={handleLogout}>
             Logout
-          </Nav.Link>
-        </Nav>
+          </Button>
+        </Navbar.Collapse>
       </Container>
     </Navbar>
   );
