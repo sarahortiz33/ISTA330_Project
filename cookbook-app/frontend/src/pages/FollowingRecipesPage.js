@@ -43,12 +43,29 @@ export default function FollowingRecipesPage({ user }) {
 
       <div className="row">
         {recipes.length > 0 && recipes.map((recipe) => (
+          
           <div key={recipe.id} className="col-md-6 col-lg-4">
             <div
               className="card mb-4 p-3 position-relative"
               style={{ cursor: "pointer", backgroundColor: "#fff8f0", borderRadius: "15px", boxShadow: "0 4px 10px rgba(0,0,0,0.1)" }}
               onClick={() => toggleExpand(recipe.id)}
             >
+              {/* Image at top of card */}
+              {recipe.photo_url && recipe.photo_url.trim() !== "" && (
+                <img
+                src={`http://localhost:5001/uploads/${recipe.photo_url}`}
+                alt={recipe.dish_name}
+                  className="img-fluid mb-3"
+                  style={{
+                    borderTopLeftRadius: "15px",
+                    borderTopRightRadius: "15px",
+                    maxHeight: "200px",
+                    objectFit: "cover",
+                    width: "100%"
+                  }}
+                />
+              )}
+
               <h5 className="card-title">{recipe.dish_name}</h5>
               <p><strong>Short Description:</strong> {recipe.short_description}</p>
               <p><strong>Category:</strong> {recipe.category}</p>
@@ -60,14 +77,6 @@ export default function FollowingRecipesPage({ user }) {
                   <p><strong>Instructions:</strong> {recipe.instructions}</p>
                   <p><strong>Prep Time:</strong> {recipe.prep_time} minutes</p>
                   <p><strong>Servings:</strong> {recipe.servings}</p>
-                  {recipe.photo_url && recipe.photo_url.trim() !== "" && (
-                    <img
-                      src={recipe.photo_url}
-                      alt={recipe.dish_name}
-                      className="img-fluid mt-2"
-                      style={{ borderRadius: "10px", maxHeight: "200px", objectFit: "cover" }}
-                    />
-                  )}
                 </div>
               )}
             </div>

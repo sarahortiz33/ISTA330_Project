@@ -1,10 +1,23 @@
 const express = require("express");
 const multer = require('multer');  
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const recipeModel = require("../models/recipeModel");
 const db = require("../models/db"); 
-const upload = multer({ dest: 'uploads/' });
 
+// ✅ Configure multer to preserve file extension
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const filename = `${uuidv4()}${ext}`;
+    cb(null, filename);
+  },
+});
+const upload = multer({ storage });
 
 //  Search Route
 router.get("/search", async (req, res) => {
@@ -25,7 +38,6 @@ router.get("/search", async (req, res) => {
     res.status(500).json({ error: "Failed to search recipes" });
   }
 });
-
 
 // POST /home - Add a new recipe
 router.post("/", async (req, res) => {
@@ -64,7 +76,7 @@ router.delete("/:recipeId", async (req, res) => {
   }
 });
 
-// Upload photo
+// ✅ Upload photo with correct file extension
 router.post('/upload-photo', upload.single('photo'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });

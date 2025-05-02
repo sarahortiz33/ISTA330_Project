@@ -80,6 +80,22 @@ export default function FavoritesPage({ user }) {
                     style={{ cursor: "pointer", position: "relative" }}
                     onClick={() => toggleExpand(recipe.id)}
                   >
+                    {/* Image at top of card */}
+                    {recipe.photo_url && recipe.photo_url.trim() !== "" && (
+                      <img
+                      src={`http://localhost:5001/uploads/${recipe.photo_url}`}
+                      alt={recipe.dish_name}
+                        className="img-fluid"
+                        style={{
+                          borderTopLeftRadius: "10px",
+                          borderTopRightRadius: "10px",
+                          maxHeight: "200px",
+                          objectFit: "cover",
+                          width: "100%",
+                        }}
+                      />
+                    )}
+
                     <div className="card-body">
                       {/* Remove Favorite X Button */}
                       <button
@@ -104,14 +120,6 @@ export default function FavoritesPage({ user }) {
                           <p><strong>Instructions:</strong> {recipe.instructions}</p>
                           <p><strong>Prep Time:</strong> {recipe.prep_time} minutes</p>
                           <p><strong>Servings:</strong> {recipe.servings}</p>
-                          {recipe.photo_url && recipe.photo_url.trim() !== "" && (
-                            <img
-                              src={recipe.photo_url}
-                              alt={recipe.dish_name}
-                              className="img-fluid mt-2"
-                              style={{ borderRadius: "10px", maxHeight: "200px", objectFit: "cover", width: "100%" }}
-                            />
-                          )}
                         </div>
                       )}
                     </div>
