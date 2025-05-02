@@ -26,7 +26,7 @@ export default function HomePage({ user }) {
           setAboutMe(response.data.status);
         }
         if (response.data.profile_pic) {
-          setProfilePic(response.data.profile_pic);
+          setProfilePic(`${response.data.profile_pic}?t=${Date.now()}`);
         }
       } catch (error) {
         console.error("Error loading user status:", error);
@@ -224,24 +224,51 @@ export default function HomePage({ user }) {
           {/* Profile Picture */}
           <Col md={4} className="text-center">
             <div style={{ position: "relative", display: "inline-block" }}>
-              <img
-                src={profilePic ? `http://localhost:5001/uploads/${profilePic}` : "https://via.placeholder.com/180"}
-                alt="Profile"
-                onClick={() => document.getElementById('profilePicInput').click()}
-                style={{ width: "180px", height: "180px", borderRadius: "50%", objectFit: "cover", cursor: "pointer", border: "3px solid #f8c291", boxShadow: "0 4px 8px rgba(0,0,0,0.2)", transition: "0.3s" }}
-                onMouseOver={(e) => (e.target.style.opacity = 0.8)}
-                onMouseOut={(e) => (e.target.style.opacity = 1)}
-              />
-              <Form.Control
-                type="file"
-                id="profilePicInput"
-                style={{ display: "none" }}
-                accept="image/*"
-                onChange={(e) => {
-                  setSelectedProfileFile(e.target.files[0]);
-                  handleProfilePicUpload();
-                }}
-              />
+            <img
+  src={`http://localhost:5001/uploads/${profilePic}`}
+  alt="Profile"
+  key={profilePic}  // This forces React to re-render the image when the value changes
+  onClick={() => document.getElementById('profilePicInput').click()}
+  style={{
+    width: "180px",
+    height: "180px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    cursor: "pointer",
+    border: "3px solid #f8c291",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+    transition: "0.3s"
+  }}
+  onMouseOver={(e) => (e.target.style.opacity = 0.8)}
+  onMouseOut={(e) => (e.target.style.opacity = 1)}
+/>
+
+<Form.Control
+  type="file"
+  id="profilePicInput"
+  style={{ display: "none" }}
+  accept="image/*"
+  onChange={async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("profile_pic", file);
+    formData.append("userId", user.userId);
+
+    try {
+      const uploadRes = await axios.post("http://localhost:5001/upload-profile-pic", formData);
+      const refreshed = await axios.get(`http://localhost:5001/profile/${user.email}`);
+      if (refreshed.data.profile_pic) {
+        setProfilePic(`${refreshed.data.profile_pic}?t=${Date.now()}`);
+      }
+      e.target.value = null; // Clear the input to allow re-selecting the same file later
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+    }
+  }}
+/>
+
             </div>
             <p className="mt-2" style={{ color: "#4e342e", fontWeight: "bold", fontSize: "0.95rem" }}>Click to change photo</p>
           </Col>
