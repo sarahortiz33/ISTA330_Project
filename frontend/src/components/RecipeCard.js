@@ -59,7 +59,6 @@ export default function RecipeCard({ recipe, onDelete }) {
               <Card.Text><strong>Description:</strong> {recipe.short_description}</Card.Text>
             )}
 
-            {/* Splits layout */}
             <Card.Text>
               <strong>Ingredients:<br></br></strong>
               {recipe.ingredients.split(",").map((ing, idx) => (
