@@ -74,7 +74,7 @@ export default function RecipeForm({ onAddRecipe }) {
 
     onAddRecipe(finalRecipeData);
 
-    // Reset form after successful submit
+    // Reset form
     setRecipeData({
       dishName: "",
       shortDescription: "",
@@ -91,7 +91,6 @@ export default function RecipeForm({ onAddRecipe }) {
 
   return (
     <Form onSubmit={handleSubmit} className="mb-4">
-
       <Form.Group className="mb-2">
         <Form.Label>Dish Name</Form.Label>
         <Form.Control
@@ -129,7 +128,7 @@ export default function RecipeForm({ onAddRecipe }) {
       </Form.Group>
 
       <Form.Group className="mb-2">
-        <Form.Label>Ingredients</Form.Label>
+        <Form.Label>Ingredients (comma-separated)</Form.Label>
         <Form.Control
           as="textarea"
           rows={2}
@@ -141,7 +140,7 @@ export default function RecipeForm({ onAddRecipe }) {
       </Form.Group>
 
       <Form.Group className="mb-2">
-        <Form.Label>Instructions</Form.Label>
+        <Form.Label>Instructions (separate with new lines)</Form.Label>
         <Form.Control
           as="textarea"
           rows={3}
@@ -184,7 +183,6 @@ export default function RecipeForm({ onAddRecipe }) {
         />
       </Form.Group>
 
-      {/* Upload Photo */}
       <Form.Group className="mb-3">
         <Form.Label>Upload Photo</Form.Label>
         <Form.Control
@@ -214,7 +212,6 @@ export default function RecipeForm({ onAddRecipe }) {
       >
         🍳 Add Recipe
       </Button>
-
     </Form>
   );
 }
